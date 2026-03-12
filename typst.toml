@@ -1,0 +1,16 @@
+[package]
+name = "unipd-thesis"
+version = "0.1.0"
+entrypoint = "lib.typ"
+compiler = "0.14.2"
+authors = ["Klaudio Merja"]
+license = "MIT"
+description = "Thesis template for National Taiwan University."
+repository = "https://github.com/klamerja/fubell"
+keywords = ["thesis", "UNIPD", "Università degli Studi di Padova", "University of Padova", "University of Padua"]
+categories = ["thesis"]
+
+[template]
+path = "template"
+entrypoint = "main.typ"
+thumbnail = "thumbnail.png"
