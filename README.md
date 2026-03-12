@@ -1,4 +1,4 @@
-# unipd-thesis
+# unipd-thesis 🎓
 
 A [Typst](https://typst.app) thesis template for students at the **University of Padua**. It supports both **Bachelor** and **Master** degrees and provides a clean, structured document layout that follows academic conventions, with built-in support for Italian and English.
 
