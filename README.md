@@ -6,7 +6,7 @@ A [Typst](https://typst.app) thesis template for students at the **University of
 
 ## Getting started
 
-### Via Typst Universe
+### Via Typst Universe [WIP - Not available]
 
 ```typ
 #import "@preview/unipd-thesis:0.1.0": *
