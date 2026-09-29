@@ -82,11 +82,12 @@
   show heading.where(level: 1): it => context {
     set align(right)
     set text(top-edge: "cap-height", bottom-edge: "baseline")
-    v(4em)
+    v(3em)
     if (it.numbering != none) {
-      block(below: 2.2em, text(size: 96pt, fill: accent)[#counter(heading).display()])
+      let outline-only = (fill: rgb(0, 0, 0, 0), stroke: 1pt + accent)
+      block(below: 2.8em, text(size: 180pt, ..outline-only)[#counter(heading).display()])
     }
-    block(width: 85%, par(leading: 0.45em, text(size: 30pt, weight: "medium")[#it.body]))
+    block(width: 85%, par(leading: 0.5em, text(size: 32pt, weight: "medium")[#it.body]))
     v(4em)
   }
 
