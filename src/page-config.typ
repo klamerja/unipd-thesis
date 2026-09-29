@@ -85,9 +85,9 @@
     v(3em)
     if (it.numbering != none) {
       let outline-only = (fill: white, stroke: 1pt + accent)
-      block(below: 2.8em, text(size: 180pt, ..outline-only)[#counter(heading).display()])
+      block(below: 2.8em, text(size: 140pt, ..outline-only)[#counter(heading).display()])
     }
-    block(width: 85%, par(leading: 0.5em, text(size: 32pt, weight: "medium")[#it.body]))
+    block(width: 85%, par(leading: 0.5em, text(size: 36pt, weight: "medium")[#it.body]))
     v(4em)
   }
 
