@@ -1,26 +1,12 @@
 # unipd-thesis 🎓
 
-A [Typst](https://typst.app) thesis template for students at the **University of Padua**. It supports both **Bachelor** and **Master** degrees and provides a clean, structured document layout that follows academic conventions, with built-in support for Italian and English.
+An independent, community-maintained [Typst](https://typst.app) thesis template for students at the **University of Padua**. It supports both **Bachelor** and **Master** degrees, with built-in Italian and English localisation. This is not an official, approved, or endorsed University template; always check the rules of your degree programme or department.
 
 ![thumbnail](https://raw.githubusercontent.com/klamerja/unipd-thesis/refs/heads/main/thumbnail.png)
 
 ## Getting started
 
-### Via Typst Universe [WIP - Not available]
-
-```typ
-#import "@preview/unipd-thesis:0.1.0": *
-```
-
-Or initialize a new project from the template:
-
-```sh
-typst init @preview/unipd-thesis
-```
-
-### Locally
-
-Clone the repository and import `lib.typ` directly:
+Clone the repository and import `lib.typ` directly from your thesis project:
 
 ```typ
 #import "lib.typ": *
@@ -30,31 +16,124 @@ Clone the repository and import `lib.typ` directly:
 
 ### `thesis-config`
 
-The root show rule. Must wrap the entire document.
+The root show rule. It must wrap the entire document and receives all thesis metadata through one `metadata` dictionary.
 
-| Parameter     | Type     | Description                                                   |
-| ------------- | -------- | ------------------------------------------------------------- |
-| `lang`        | `string` | Document language: `"it"` (Italian) or `"en"` (English)       |
-| `author`      | `string` | Author's full name                                            |
-| `title`       | `string` | Thesis title                                                  |
-| `description` | `string` | Short description used in document metadata                   |
-| `printable`   | `bool`   | When `true`, enables print-friendly layout (blank pages etc.) |
+| Parameter   | Type         | Description                                                    |
+| ----------- | ------------ | -------------------------------------------------------------- |
+| `metadata`  | `dictionary` | Thesis, author, course, and cover metadata                      |
+| `lang`      | `string`     | Document language: `"it"` (Italian) or `"en"` (English)        |
+| `printable` | `bool`       | When `true`, enables print-friendly layout (blank pages etc.)  |
+| `profile`   | `dictionary` | Optional typography and margin profile; defaults to `default-profile` |
+| `document-date` | `datetime`   | Required fixed creation date for reproducible PDF metadata          |
+
+The `metadata` dictionary contains:
+
+| Field           | Type         | Description                                      |
+| --------------- | ------------ | ------------------------------------------------ |
+| `title`         | `string`     | Thesis title                                     |
+| `author`        | `dictionary` | `name`, `student-id`, and optional cover `label` |
+| `supervisors`   | `array`      | One or more supervisor dictionaries              |
+| `academic-year` | `string`     | Academic year, for example `"2026-2027"`         |
+| `department`    | `content`    | Department name                                  |
+| `degree`        | `content`    | Degree programme name                            |
+| `degree-type`   | `string`     | `"bachelor"` or `"master"`                      |
+| `description`   | `string`     | Optional description used in the PDF metadata    |
+
+All fields except `description` are required. The template validates the configuration before rendering and reports the complete path of any missing or invalid field, such as `metadata.author.student-id`.
+
+```typ
+#show: thesis-config.with(
+  lang: "it",
+  printable: true,
+  document-date: datetime(year: 2026, month: 1, day: 1),
+  metadata: (
+    title: "Your Thesis Title",
+    author: (
+      name: "Your Name",
+      student-id: "0000000",
+      label: "Laureanda", // Optional cover label.
+    ),
+    supervisors: (
+      (
+        role: "supervisor",
+        title: "Prof.",
+        name: "Supervisor Name",
+      ),
+      (
+        role: "co-supervisor",
+        title: "Dr.",
+        name: "Co-supervisor Name",
+        department: [Department of the Co-supervisor],
+      ),
+    ),
+    academic-year: "2026-2027",
+    department: [Dipartimento di Matematica 'Tullio Levi-Civita'],
+    degree: [Informatica],
+    degree-type: "bachelor",
+    description: "BSc thesis in Computer Science, University of Padua",
+  ),
+)
+```
+
+`document-date` is required because PDF/A requires a creation date. It is also used for the month and year on the copyright page. Always use a fixed value so rebuilding the same sources does not introduce the current date into the output:
+
+```typ
+#show: thesis-config.with(
+  document-date: datetime(year: 2026, month: 9, day: 16),
+  metadata: (...),
+)
+```
+
+Avoid `datetime.today()`: it changes with the build environment and makes the PDF metadata non-reproducible.
+
+Each supervisor dictionary accepts:
+
+| Field        | Type      | Required | Description                                      |
+| ------------ | --------- | -------- | ------------------------------------------------ |
+| `role`       | `string`  | yes      | `"supervisor"` or `"co-supervisor"`              |
+| `name`       | `string`  | yes      | Full name without the academic title             |
+| `title`      | `string`  | no       | Academic title, for example `"Prof."` or `"Dr."` |
+| `department` | `content` | no       | Department shown below the person's name         |
+
+The optional `metadata.author.label` replaces the default candidate label on the cover. For example, an Italian thesis can use `label: "Laureanda"`; the default labels are `Laureando` and `Candidate` for Italian and English.
+
+### Department profiles
+
+`thesis-profile` creates a reusable presentation profile for margins and body typography. The package intentionally ships only a neutral `default-profile`: department requirements vary, so a named profile must be checked against the current instructions of the relevant degree programme and must not be treated as certified compliance.
+
+```typ
+#let my-department-profile = thesis-profile(
+  name: "my-department-2026",
+  page-margin: (
+    top: 3cm,
+    bottom: 3cm,
+    left: 3.5cm,
+    right: 3cm,
+  ),
+  cover-margin: (x: 3.5cm, y: 4cm),
+  font: "New Computer Modern",
+  heading-font: "EB Garamond",
+  text-size: 12pt,
+  leading: 0.65em,
+  paragraph-spacing: 1em,
+  first-line-indent: 1.8em,
+)
+
+#show: thesis-config.with(
+  profile: my-department-profile,
+  metadata: (...),
+)
+```
+
+The profile and all its fields are validated before rendering. Invalid or missing values produce an error that identifies the complete field path.
 
 ### `cover`
 
-Renders the official UNIPD cover page.
+Renders the UNIPD cover page using the data supplied to `thesis-config`.
 
-| Parameter          | Type      | Description                                           |
-| ------------------ | --------- | ----------------------------------------------------- |
-| `supervisor-title` | `string`  | Academic title of the supervisor (e.g. `"Prof."`)     |
-| `supervisor-name`  | `string`  | Full name of the supervisor                           |
-| `graduand-name`    | `string`  | Full name of the student                              |
-| `university-id`    | `string`  | Student ID (matricola)                                |
-| `thesis-title`     | `string`  | Thesis title displayed on the cover                   |
-| `academic-year`    | `string`  | Academic year (e.g. `"2024-2025"`)                    |
-| `department`       | `content` | Department name (e.g. `[Dipartimento di Matematica]`) |
-| `degree`           | `content` | Degree program name (e.g. `[Informatica]`)            |
-| `degree-type`      | `string`  | `"bachelor"` or `"master"`                            |
+```typ
+#cover()
+```
 
 ### `preface`
 
@@ -72,14 +151,21 @@ Show rule that starts the main body of the thesis. Resets the page counter to `1
 #show: main
 ```
 
+### `back-matter`
+
+Show rule for unnumbered end matter. Each level-1 heading starts on a new page.
+
+```typ
+#show: back-matter
+```
+
 ### `copyright`
 
-Renders the copyright page.
+Renders the copyright page using the author and title supplied to `thesis-config`.
 
-| Parameter       | Type     | Description         |
-| --------------- | -------- | ------------------- |
-| `graduand-name` | `string` | Author's full name  |
-| `thesis-title`  | `string` | Title of the thesis |
+```typ
+#copyright()
+```
 
 ---
 
@@ -111,11 +197,31 @@ Renders the abstract/summary section. The heading label is localised automatical
 
 ### `toc`
 
-Renders the table of contents. Also includes a list of figures, list of tables, and list of code listings if any are present in the document.
+Renders the table of contents. Lists of figures, tables, and code blocks are included automatically only when they contain entries.
 
 ```typ
 #toc()
 ```
+
+Each auxiliary list accepts `"auto"` (the default), `true`, or `false`:
+
+```typ
+#toc(
+  figures: "auto",
+  tables: true,
+  code-blocks: false,
+)
+```
+
+## PDF/A export
+
+The cover image includes alternative text, so the template can be exported to an accessible PDF/A profile. With the Typst CLI, run:
+
+```sh
+typst compile --pdf-standard a-2a index.typ thesis.pdf
+```
+
+In the Typst web app, select `PDF/A-2a` in the PDF export settings.
 
 ### Acronyms
 
@@ -133,7 +239,7 @@ Initialises the acronym registry. Must be called before any use of `#acr()`. Acc
 
 #### `acr(key)`
 
-Inserts a hyperlinked acronym that links back to the acronyms list. Tracks every page where the acronym is used.
+Inserts a hyperlinked acronym that links back to the acronyms list. The first use is expanded automatically, for example _Application Programming Interface_ (`API`); subsequent uses display only `API`. It tracks every page where the acronym is used and reports a clear error if the registry has not been initialized or the requested acronym is undefined. Duplicate acronym keys cannot occur because Typst dictionaries require unique keys.
 
 ```typ
 Use #acr("API") to call an endpoint.
@@ -144,7 +250,7 @@ Use #acr("API") to call an endpoint.
 Prints the full acronym list in a two-column grid, with each entry showing the short form, its definition, and the page numbers where it appears.
 
 ```typ
-= Acronimi
+= #acronyms-title()
 #print-acronyms()
 ```
 
@@ -160,7 +266,7 @@ Initialises the glossary. Must be called before any use of `#gls()`. Accepts an 
 | `display_name` | `content` | Term as it should appear in the glossary |
 | `description`  | `content` | Definition of the term                   |
 
-Panics if duplicate keys are detected.
+Duplicate keys produce an error that lists every duplicated key.
 
 ```typ
 #let my-glossary = (
@@ -171,7 +277,7 @@ Panics if duplicate keys are detected.
 
 #### `gls(key, display: none)`
 
-Inserts a hyperlinked glossary reference. By default the key string is used as the link label; pass `display:` to override it.
+Inserts a hyperlinked glossary reference. By default the key string is used as the link label; pass `display:` to override it. Reports a clear error if the registry has not been initialized or the requested key is undefined.
 
 ```typ
 #gls("ml")                          // displays "ml"
@@ -183,7 +289,7 @@ Inserts a hyperlinked glossary reference. By default the key string is used as t
 Prints the full glossary sorted alphabetically by key, with page references for each term.
 
 ```typ
-= Glossario
+= #glossary-title()
 #print-glossary()
 ```
 
@@ -192,12 +298,21 @@ Prints the full glossary sorted alphabetically by key, with page references for 
 The template ships with full Italian and English string tables. Set the language in `thesis-config`:
 
 ```typ
-#show: thesis-config.with(lang: "it", ...)  // Italian (default)
-#show: thesis-config.with(lang: "en", ...)  // English
+#show: thesis-config.with(
+  lang: "en",
+  document-date: datetime(year: 2026, month: 9, day: 17),
+  metadata: (...),
+)
 ```
 
 Localised strings include section headings (acknowledgements, abstract, table of contents, etc.), cover page labels (supervisor, student ID, academic year), and degree type labels.
 
+## Project status and trademark notice
+
+This repository is an independent project and is not an official or endorsed University of Padua template. The University publishes its own rules on the [use of its logo and requests for authorization](https://www.unipd.it/patrocini-uso-marchio), as well as the applicable [name, image, and trademark regulations](https://www.unipd.it/node/79418).
+
+The MIT License applies to the project source code, not to the University name, seal, or logo. Permission to redistribute the bundled logo through Typst Universe or another package registry has not been established. See [NOTICE.md](NOTICE.md) before publishing or redistributing the package.
+
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Source code: MIT — see [LICENSE](LICENSE). University trademarks and visual identity assets are excluded; see [NOTICE.md](NOTICE.md).

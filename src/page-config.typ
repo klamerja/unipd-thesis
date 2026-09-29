@@ -1,32 +1,29 @@
 #import "i18n.typ": _lang
-#import "metadata.typ": _printable, _thesis-title, _author, _supervisor, _university-id, _academic-year, _department, _degree, _degree-type
+#import "metadata.typ": _metadata, _printable, _profile, _document-date
+#import "profiles.typ": default-profile
+#import "validation.typ": validate-thesis-config, validate-thesis-profile
 
 #let thesis-config(
-  title: str,
-  author: str,
-  description: str,
-  printable: bool,
+  metadata: (:),
+  printable: false,
   lang: "it",
-  supervisor: str,
-  university-id: str,
-  academic-year: str,
-  department: [],
-  degree: [],
-  degree-type: "bachelor",
+  profile: default-profile,
+  document-date: none,
   content,
 ) = {
-  _lang.update(lang)
-  _printable.update(printable)
-  _thesis-title.update(title)
-  _author.update(author)
-  _supervisor.update(supervisor)
-  _university-id.update(university-id)
-  _academic-year.update(academic-year)
-  _department.update(department)
-  _degree.update(degree)
-  _degree-type.update(degree-type)
+  let metadata = validate-thesis-config(metadata, lang, printable, document-date)
+  let profile = validate-thesis-profile(profile)
+  let title = metadata.at("title")
+  let author = metadata.at("author").at("name")
+  let description = metadata.at("description", default: "")
 
-  set document(date: datetime.today(), author: author, title: title, description: description)
+  _lang.update(lang)
+  _metadata.update(metadata)
+  _printable.update(printable)
+  _profile.update(profile)
+  _document-date.update(document-date)
+
+  set document(date: document-date, author: author, title: title, description: description)
 
   show link: it => {
     if (type(it.dest) == str) {
@@ -38,19 +35,14 @@
     }
   }
 
-  set page(paper: "a4", number-align: center, margin: (
-    top: 3.5cm,
-    bottom: 3.5cm,
-    left: 4cm,
-    right: 4cm,
-  ))
+  set page(paper: "a4", number-align: center, margin: profile.at("page-margin"))
 
-  set text(lang: lang, size: 10pt, font: "New Computer Modern")
+  set text(lang: lang, size: profile.at("text-size"), font: profile.at("font"))
 
   set par(
-    leading: 0.55em,
-    spacing: 1em,
-    first-line-indent: 1.8em,
+    leading: profile.at("leading"),
+    spacing: profile.at("paragraph-spacing"),
+    first-line-indent: profile.at("first-line-indent"),
     justify: true,
   )
 
@@ -80,34 +72,32 @@
 
   set heading(numbering: "1.1")
 
+  let accent = rgb("#9b0014")
+
+  show heading: set text(font: profile.at("heading-font"))
+  show heading: set par(justify: false)
+  show heading: set text(hyphenate: false)
+
+  // Chapters always open on a right-hand page, so the title sits against the outer (right) margin.
   show heading.where(level: 1): it => context {
+    set align(right)
+    set text(top-edge: "cap-height", bottom-edge: "baseline")
     v(4em)
     if (it.numbering != none) {
-      stack(
-        spacing: 1.5em,
-        rect(fill: rgb("#9b0014"), inset: 15pt)[
-          #align(center + horizon)[
-            #text(size: 50pt, weight: "light", fill: luma(255))[
-              #counter(heading).display()
-            ]
-          ]
-        ],
-        text(size: 28pt, weight: "bold")[#it.body],
-      )
-    } else {
-      block(text(size: 28pt, weight: "bold")[#it.body])
+      block(below: 2.2em, text(size: 96pt, fill: accent)[#counter(heading).display()])
     }
-    v(3em)
+    block(width: 85%, par(leading: 0.45em, text(size: 30pt, weight: "medium")[#it.body]))
+    v(4em)
   }
 
   show heading.where(level: 2): it => {
-    set text(size: 15pt, weight: "bold")
+    set text(size: 16pt, weight: "semibold")
     v(5pt)
     it
     v(5pt)
   }
 
-  show heading.where(level: 3): set text(size: 12pt, weight: "bold")
+  show heading.where(level: 3): set text(size: 13pt, weight: "semibold")
 
   show figure: set block(above: 1.5em, below: 1.5em)
 

@@ -1,6 +1,6 @@
 #import "i18n.typ": t
 
-#let acknowledgements(quote: "", quote-author: "", body) = {
+#let acknowledgements(quote: "", quote-author: "", body) = context {
   set par(first-line-indent: 0pt)
   [
     #align(right)[

@@ -1,6 +1,6 @@
 #import "i18n.typ": t
 
-#let summary(content) = {
+#let summary(content) = context {
   set par(first-line-indent: 0pt)
   [
     = #t("summary")

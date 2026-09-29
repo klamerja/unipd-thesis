@@ -1,5 +1,4 @@
 #import "lib.typ": *
-#import "@preview/treet:1.0.0": *
 
 // Glossary
 #let glossary = (
@@ -24,15 +23,26 @@
 #show: thesis-config.with(
   printable: true,
   lang: "it",
-  author: "Fabio Tozzi",
-  title: "L'arte di non saper scrivere",
-  description: "BSc thesis in Computer Science, University of Padova",
-  supervisor: "Prof. Big T",
-  university-id: "2222777",
-  academic-year: "2024-2025",
-  department: [Dipartimento di Matematics 'Tullio Levi-Civita'],
-  degree: [Scienze Insulse],
-  degree-type: "bachelor",
+  document-date: datetime(year: 2026, month: 9, day: 16),
+  metadata: (
+    title: "L'arte di non saper scrivere",
+    author: (
+      name: "Fabio Tozzi",
+      student-id: "2222777",
+    ),
+    supervisors: (
+      (
+        role: "supervisor",
+        title: "Prof.",
+        name: "Big T",
+      ),
+    ),
+    academic-year: "2024-2025",
+    department: [Dipartimento di Matematica 'Tullio Levi-Civita'],
+    degree: [Scienze Insulse],
+    degree-type: "bachelor",
+    description: "BSc thesis in Computer Science, University of Padova",
+  ),
 )
 
 // Cover
@@ -53,8 +63,7 @@
 ]
 
 #summary[
-  Write a short summary of your thesis here. This section appears in the
-  preface and gives the reader an overview of the contents.
+  Write a short summary of your thesis here. This section appears in the preface and gives the reader an overview of the contents.
 ]
 
 #toc()
@@ -64,8 +73,7 @@
 
 = Introduction
 
-Write your introduction here. Use #acr("API") to reference acronyms and
-#gls("example-term") to reference glossary terms.
+Write your introduction here. Use #acr("API") to reference acronyms and #gls("example-term") to reference glossary terms.
 
 == Background
 
@@ -76,15 +84,15 @@ Add chapters as needed @example-site.
 // Back matter
 #show: back-matter
 
-= Glossario
+= #glossary-title()
 
 #print-glossary()
 
-= Acronimi
+= #acronyms-title()
 
 #print-acronyms()
 
-/* full param setted true is needed to show all the entries (including those without a citation) in the bibliography*/
+// `full: true` shows entries even when they are not cited in the text.
 #bibliography(
   "bibliography.yml",
   title: "Bibliografia",

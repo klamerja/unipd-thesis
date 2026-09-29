@@ -1,24 +1,38 @@
 #import "i18n.typ": t
 
-#let toc() = {
-  [
-    #[
-      #show outline.entry.where(
-        level: 1,
-      ): set block(above: 1.5em)
-      #show outline.entry.where(level: 1): set text(weight: "extrabold")
+#let _include-list(option, target, name) = {
+  if option == "auto" {
+    query(target).any(item => item.outlined and item.caption != none)
+  } else if type(option) == bool {
+    option
+  } else {
+    panic("toc parameter `" + name + "` must be `\"auto\"`, `true`, or `false`")
+  }
+}
 
-      #outline(title: [#t("toc")])
-    ]
-    #pagebreak(weak: true)
+#let toc(figures: "auto", code-blocks: "auto", tables: "auto") = context {
+  show outline.entry.where(level: 1): set block(above: 1.5em)
+  show outline.entry.where(level: 1): set text(weight: "extrabold")
 
-    #outline(title: [#t("figures")], target: figure.where(kind: image))
+  outline(title: [#t("toc")])
 
-    #v(4em)
-    #outline(title: [#t("listings")], target: figure.where(kind: raw))
-    #pagebreak(weak: true)
+  let auxiliary-lists = (
+    (option: figures, title: t("figures"), target: figure.where(kind: image), name: "figures"),
+    (
+      option: code-blocks,
+      title: t("code-blocks"),
+      target: figure.where(kind: raw),
+      name: "code-blocks",
+    ),
+    (option: tables, title: t("tables"), target: figure.where(kind: table), name: "tables"),
+  )
 
-    #outline(title: [#t("tables")], target: figure.where(kind: table))
-    #pagebreak(weak: true)
-  ]
+  for list in auxiliary-lists {
+    if _include-list(list.option, list.target, list.name) {
+      pagebreak(weak: true)
+      outline(title: list.title, target: list.target)
+    }
+  }
+
+  pagebreak(weak: true)
 }
