@@ -1,7 +1,49 @@
-#import "i18n.typ": _lang
-#import "metadata.typ": _metadata, _printable, _profile, _document-date, _recto-break
+#import "i18n.typ": _lang, t
+#import "metadata.typ": _metadata, _printable, _profile, _document-date, _recto-break, _is-blank-page
 #import "profiles.typ": default-profile
 #import "validation.typ": validate-thesis-config, validate-thesis-profile
+
+#let _heading-label(target) = {
+  if target.numbering == none { return target.body }
+  numbering(target.numbering, ..counter(heading).at(target.location())) + h(0.8em) + target.body
+}
+
+// Chapter-opening pages and the blank pages left before a section carry no header.
+#let _page-kind(current) = {
+  if query(heading.where(level: 1)).any(chapter => chapter.location().page() == current) { "opening" } else if _is-blank-page(current) { "blank" } else { "body" }
+}
+
+// Book convention: the left-hand page names the chapter, the right-hand page the current section.
+// Both sit against the outer margin.
+#let _running-header() = context {
+  let current = here().page()
+  let previous-chapters = query(heading.where(level: 1).before(here()))
+  if _page-kind(current) != "body" or previous-chapters.len() == 0 { return }
+
+  let chapter = previous-chapters.last()
+  let label = if calc.even(current) {
+    let number = if chapter.numbering != none { t("chapter") + " " + counter(heading).at(chapter.location()).map(str).join(".") + ". " }
+    upper[#number#chapter.body]
+  } else {
+    let on-page = query(heading.where(level: 2)).filter(section => section.location().page() == current)
+    let before = query(heading.where(level: 2).after(chapter.location()).before(here()))
+    let section = if on-page.len() > 0 { on-page.first() } else if before.len() > 0 { before.last() } else { chapter }
+    _heading-label(section)
+  }
+
+  set text(size: 9pt)
+  set align(if calc.even(current) { left } else { right })
+  label
+  v(-0.55em)
+  line(length: 100%, stroke: 0.4pt)
+}
+
+// Page numbers are centred and omitted on blank filler pages.
+#let _page-footer() = context {
+  let current = here().page()
+  if page.numbering == none or _is-blank-page(current) { return }
+  align(center, counter(page).display(page.numbering))
+}
 
 #let thesis-config(
   metadata: (:),
@@ -35,7 +77,7 @@
     }
   }
 
-  set page(paper: "a4", number-align: center, margin: profile.at("page-margin"))
+  set page(paper: "a4", margin: profile.at("page-margin"), footer: _page-footer())
 
   set text(lang: lang, size: profile.at("text-size"), font: profile.at("font"))
 
@@ -118,7 +160,7 @@
 
 #let main(body) = {
   counter(page).update(1)
-  set page(numbering: "1.")
+  set page(numbering: "1.", header: _running-header())
 
   counter(heading).update(0)
   set heading(outlined: true, numbering: "1.1")
@@ -132,6 +174,7 @@
 }
 
 #let back-matter(body) = {
+  set page(header: none)
   set heading(numbering: none)
 
   show heading.where(level: 1): it => {

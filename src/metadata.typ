@@ -7,3 +7,9 @@
 #let _recto-break() = context {
   if _printable.get() { pagebreak(weak: true, to: "odd") } else { pagebreak(weak: true) }
 }
+
+// The filler pages left by `_recto-break` are the even pages holding no content at all.
+#let _is-blank-page(current) = {
+  let content = selector.or(par, heading, figure, table, image, raw, math.equation, list, enum, terms)
+  _printable.get() and calc.even(current) and not query(content).any(element => element.location().page() == current)
+}

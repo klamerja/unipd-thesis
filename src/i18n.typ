@@ -4,6 +4,7 @@
   it: (
     acknowledgements: "Ringraziamenti",
     summary: "Sommario",
+    chapter: "Capitolo",
     glossary: "Glossario",
     acronyms: "Acronimi",
     toc: "Indice",
@@ -29,6 +30,7 @@
   en: (
     acknowledgements: "Acknowledgements",
     summary: "Abstract",
+    chapter: "Chapter",
     glossary: "Glossary",
     acronyms: "Acronyms",
     toc: "Table of Contents",
