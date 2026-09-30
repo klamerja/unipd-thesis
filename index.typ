@@ -86,6 +86,14 @@ Add chapters as needed @example-site.
 
 #lorem(2000)
 
+== Key Results
+
+#lorem(200)
+
+== Test of footnotes
+
+Test#footnote[This is a footnote.]
+
 // Back matter
 #show: back-matter
 
