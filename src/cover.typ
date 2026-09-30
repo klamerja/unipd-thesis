@@ -1,5 +1,9 @@
 #import "i18n.typ": t
-#import "metadata.typ": _metadata, _printable, _profile
+#import "metadata.typ": _metadata, _profile, _recto-break
+
+#let _accent = rgb("#9b0014")
+
+#let _label(key) = text(size: 8.5pt, tracking: 0.12em, fill: _accent, upper(key))
 
 #let _supervisor-name(supervisor) = {
   let title = supervisor.at("title", default: "")
@@ -7,102 +11,69 @@
   if title == "" { name } else { title + " " + name }
 }
 
-#let _supervisor-card(supervisor) = {
+#let _supervisor-card(supervisor, name-size) = {
   let department = supervisor.at("department", default: none)
 
-  block[
-    #set par(justify: false)
-    *#t(supervisor.at("role"))*#linebreak()
-    #smallcaps[#_supervisor-name(supervisor)]
-    #if department != none {
-      linebreak()
-      text(size: 8.5pt, style: "italic", department)
-    }
-  ]
+  stack(
+    spacing: 0.9em,
+    _label(t(supervisor.at("role"))),
+    text(size: name-size, _supervisor-name(supervisor)),
+    ..if department != none { (text(size: 9pt, fill: luma(90), department),) },
+  )
 }
 
 #let cover() = context {
   let metadata = _metadata.get()
-  let printable = _printable.get()
   let profile = _profile.get()
-  let thesis-title = metadata.at("title")
   let author = metadata.at("author")
-  let graduand-name = author.at("name")
-  let graduand-label = author.at("label", default: t("graduand"))
-  let university-id = author.at("student-id")
   let supervisors = metadata.at("supervisors")
-  let academic-year = metadata.at("academic-year")
-  let department = metadata.at("department")
-  let degree = metadata.at("degree")
   let degree-type = metadata.at("degree-type")
+  // Strings bypass smart quotes, so the typographic apostrophe is set explicitly.
+  let thesis-title = metadata.at("title").replace("'", "’")
   let supervisor-count = supervisors.len()
-  let supervisor-text-size = if supervisor-count >= 4 {
-    8.5pt
-  } else if supervisor-count >= 3 {
-    9.5pt
-  } else {
-    11pt
-  }
-  let supervisor-spacing = if supervisor-count >= 3 { 0.7em } else { 1.2em }
+  let name-size = if supervisor-count >= 4 { 10pt } else { 12pt }
+  let supervisor-spacing = if supervisor-count >= 3 { 1.4em } else { 1.8em }
 
   set page(numbering: none, margin: profile.at("cover-margin"))
-  set par(first-line-indent: 0pt)
+  set par(first-line-indent: 0pt, justify: false, leading: 0.75em)
 
   grid(
     columns: 100%,
     rows: (auto, 1fr, auto),
-    row-gutter: 3em,
-    align: center,
-    [
-      #text(size: 18pt, weight: "bold")[#t("unipd")]
-
-      #text(size: 14pt, weight: "medium")[#smallcaps[#department]]
-
-      #text(size: 12pt)[#smallcaps[#t("degree-" + degree-type) #degree]]
+    align(center)[
+      #image("./assets/unipd-new-logo.png", height: 5.5cm, alt: t("unipd-logo-alt"))
+      #v(1.4em)
+      #text(size: 12pt, tracking: 0.3em, upper(t("unipd")))
+      #v(0.2em)
+      #text(size: 10.5pt, metadata.at("department")) \
+      #text(size: 10.5pt)[#t("degree-" + degree-type) #metadata.at("degree")]
     ],
     align(center + horizon)[
-
-      #figure(numbering: none, outlined: false)[
-        #image("./assets/unipd-new-logo.png", height: 6cm, alt: t("unipd-logo-alt"))
-      ]
-
-      #v(3em)
-
-      #text(size: 18pt, weight: "extrabold", hyphenate: false)[
-        #set par(justify: false)
-        #thesis-title
-      ]
-
-      #text(size: 14pt)[#t("thesis-label" + if degree-type == "master" { "-master" } else { "" })]
-
-      #v(4em)
-
-      #grid(
-        columns: (1fr, 1fr),
-        align: (left + top, right + top),
-        column-gutter: 2em,
-        text(size: supervisor-text-size)[
-          #stack(
-            spacing: supervisor-spacing,
-            ..supervisors.map(supervisor => _supervisor-card(supervisor)),
-          )
-        ],
-        text(size: supervisor-text-size)[
-          #set par(justify: false)
-          *#graduand-label*
-          #linebreak()
-          #smallcaps[#graduand-name]
-          #linebreak()
-          #smallcaps[#t("student-id")] #university-id
-        ],
-      )
+      #block(width: 90%, text(size: 28pt, hyphenate: false, par(leading: 0.45em, thesis-title)))
+      #v(1em)
+      #line(length: 2.5cm, stroke: 0.8pt + _accent)
+      #v(0.8em)
+      #text(size: 13pt, t("thesis-label" + if degree-type == "master" { "-master" } else { "" }))
     ],
     [
-      #line(length: 80%, stroke: 0.5pt)
-
-      #smallcaps[#t("academic-year") #academic-year]
+      #line(length: 100%, stroke: 0.5pt + luma(150))
+      #v(1em)
+      #grid(
+        columns: (1fr, 1fr),
+        column-gutter: 2em,
+        align: (left + top, right + top),
+        stack(spacing: supervisor-spacing, ..supervisors.map(supervisor => _supervisor-card(supervisor, name-size))),
+        stack(
+          spacing: 0.9em,
+          _label(author.at("label", default: t("graduand"))),
+          text(size: name-size, author.at("name")),
+          text(size: 10pt, fill: luma(90))[#t("student-id") #author.at("student-id")],
+        ),
+      )
+      #v(2.4em)
+      #align(center, text(size: 10pt, tracking: 0.15em, fill: _accent)[#upper(t("academic-year")) #metadata.at("academic-year")])
     ],
   )
 
-  if printable { pagebreak(to: "odd") } else { pagebreak() }
+  _recto-break()
 }
