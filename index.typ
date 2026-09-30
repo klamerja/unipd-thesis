@@ -22,7 +22,7 @@
 // Document config
 #show: thesis-config.with(
   printable: true,
-  lang: "it",
+  lang: "en",
   document-date: datetime(year: 2026, month: 9, day: 16),
   metadata: (
     title: "L'arte di non saper scrivere",
@@ -36,10 +36,15 @@
         title: "Prof.",
         name: "Big T",
       ),
+      (
+        role: "co-supervisor",
+        title: "Dr.",
+        name: "Small T",
+      ),
     ),
-    academic-year: "2024-2025",
-    department: [Dipartimento di Matematica 'Tullio Levi-Civita'],
-    degree: [Scienze Insulse],
+    academic-year: "2026-2027",
+    department: [Departhment of Mathematics "Tullio Levi-Civita"],
+    degree: [Computer Science],
     degree-type: "bachelor",
     description: "BSc thesis in Computer Science, University of Padova",
   ),
@@ -95,7 +100,7 @@ Add chapters as needed @example-site.
 // `full: true` shows entries even when they are not cited in the text.
 #bibliography(
   "bibliography.yml",
-  title: "Bibliografia",
+  title: "Bibliography",
   style: "the-institution-of-engineering-and-technology",
   full: true,
 )
