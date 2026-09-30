@@ -1,5 +1,5 @@
 #import "i18n.typ": t, month-name
-#import "metadata.typ": _metadata, _document-date
+#import "metadata.typ": _metadata, _document-date, _recto-break
 
 #let copyright() = context {
   let metadata = _metadata.get()
@@ -12,5 +12,5 @@
   align(left + bottom)[
     #graduand-name: #text(style: "italic")[#thesis-title], #t("thesis-label" + if degree-type == "master" { "-master" } else { "" }), © #month-name(document-date.month()) #document-date.year()
   ]
-  pagebreak(weak: true)
+  _recto-break()
 }

@@ -1,5 +1,5 @@
 #import "i18n.typ": _lang
-#import "metadata.typ": _metadata, _printable, _profile, _document-date
+#import "metadata.typ": _metadata, _printable, _profile, _document-date, _recto-break
 #import "profiles.typ": default-profile
 #import "validation.typ": validate-thesis-config, validate-thesis-profile
 
@@ -87,7 +87,7 @@
       let outline-only = (fill: white, stroke: 1pt + accent)
       block(below: 2.8em, text(size: 140pt, ..outline-only)[#counter(heading).display()])
     }
-    block(width: 85%, par(leading: 0.5em, text(size: 36pt, weight: "medium")[#it.body]))
+    block(width: 85%, text(size: 36pt, weight: "medium", par(leading: 0.4em, it.body)))
     v(4em)
   }
 
@@ -116,9 +116,7 @@
   body
 }
 
-#let main(body) = context {
-  let printable = _printable.get()
-
+#let main(body) = {
   counter(page).update(1)
   set page(numbering: "1.")
 
@@ -126,20 +124,18 @@
   set heading(outlined: true, numbering: "1.1")
 
   show heading.where(level: 1): it => {
-    if printable { pagebreak(to: "odd") } else { pagebreak(weak: true) }
+    _recto-break()
     it
   }
 
   body
 }
 
-#let back-matter(body) = context {
-  let printable = _printable.get()
-
+#let back-matter(body) = {
   set heading(numbering: none)
 
   show heading.where(level: 1): it => {
-    if printable { pagebreak(to: "odd") } else { pagebreak(weak: true) }
+    _recto-break()
     it
   }
 

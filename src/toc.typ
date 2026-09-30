@@ -1,4 +1,5 @@
 #import "i18n.typ": t
+#import "metadata.typ": _recto-break
 
 #let _include-list(option, target, name) = {
   if option == "auto" {
@@ -29,10 +30,10 @@
 
   for list in auxiliary-lists {
     if _include-list(list.option, list.target, list.name) {
-      pagebreak(weak: true)
+      _recto-break()
       outline(title: list.title, target: list.target)
     }
   }
 
-  pagebreak(weak: true)
+  _recto-break()
 }
