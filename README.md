@@ -18,13 +18,13 @@ Clone the repository and import `lib.typ` directly from your thesis project:
 
 The root show rule. It must wrap the entire document and receives all thesis metadata through one `metadata` dictionary.
 
-| Parameter   | Type         | Description                                                    |
-| ----------- | ------------ | -------------------------------------------------------------- |
-| `metadata`  | `dictionary` | Thesis, author, course, and cover metadata                      |
-| `lang`      | `string`     | Document language: `"it"` (Italian) or `"en"` (English)        |
-| `printable` | `bool`       | When `true`, enables print-friendly layout (blank pages etc.)  |
-| `profile`   | `dictionary` | Optional typography and margin profile; defaults to `default-profile` |
-| `document-date` | `datetime`   | Required fixed creation date for reproducible PDF metadata          |
+| Parameter       | Type         | Description                                                           |
+| --------------- | ------------ | --------------------------------------------------------------------- |
+| `metadata`      | `dictionary` | Thesis, author, course, and cover metadata                            |
+| `lang`          | `string`     | Document language: `"it"` (Italian) or `"en"` (English)               |
+| `printable`     | `bool`       | When `true`, enables print-friendly layout (blank pages etc.)         |
+| `profile`       | `dictionary` | Optional typography and margin profile; defaults to `default-profile` |
+| `document-date` | `datetime`   | Required fixed creation date for reproducible PDF metadata            |
 
 The `metadata` dictionary contains:
 
@@ -36,7 +36,7 @@ The `metadata` dictionary contains:
 | `academic-year` | `string`     | Academic year, for example `"2026-2027"`         |
 | `department`    | `content`    | Department name                                  |
 | `degree`        | `content`    | Degree programme name                            |
-| `degree-type`   | `string`     | `"bachelor"` or `"master"`                      |
+| `degree-type`   | `string`     | `"bachelor"` or `"master"`                       |
 | `description`   | `string`     | Optional description used in the PDF metadata    |
 
 All fields except `description` are required. The template validates the configuration before rendering and reports the complete path of any missing or invalid field, such as `metadata.author.student-id`.
@@ -311,7 +311,7 @@ Localised strings include section headings (acknowledgements, abstract, table of
 
 This repository is an independent project and is not an official or endorsed University of Padua template. The University publishes its own rules on the [use of its logo and requests for authorization](https://www.unipd.it/patrocini-uso-marchio), as well as the applicable [name, image, and trademark regulations](https://www.unipd.it/node/79418).
 
-The MIT License applies to the project source code, not to the University name, seal, or logo. Permission to redistribute the bundled logo through Typst Universe or another package registry has not been established. See [NOTICE.md](NOTICE.md) before publishing or redistributing the package.
+The MIT License applies to the project source code, not to the University name, seal, or logo.
 
 ## License
 
